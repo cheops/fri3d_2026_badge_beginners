@@ -1,0 +1,11 @@
+[workspace]
+channels = ["conda-forge"]
+name = "icon_generator"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = ">=3.14.6,<3.15"
+pillow = ">=12.3.0,<13"
