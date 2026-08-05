@@ -1,0 +1,21 @@
+{
+  "name": "Blinky Badge",
+  "publisher": "joram",
+  "short_description": "Control leds",
+  "long_description": "App to control badge leds and SAO leds",
+  "fullname": "com.joram.blinkybadge",
+  "version": "0.1.0",
+  "category": "development",
+  "activities": [
+    {
+      "entrypoint": "blinky_badge.py",
+      "classname": "BlinkyBadge",
+      "intent_filters": [
+        {
+          "action": "main",
+          "category": "launcher"
+        }
+      ]
+    }
+  ]
+}
