@@ -1,0 +1,14 @@
+- name: Build .mpk
+  id: build
+  uses: tjorim/mpos-package-mpk@v1
+  with:
+    app-dir: com.joram.blinkybadge
+
+- name: Publish to BadgeHub
+  uses: tjorim/mpos-badgehub-publish@v1
+  with:
+    slug: com.joram.blinkybadge
+    api-token: ${{ secrets.BADGEHUB_API_TOKEN }}
+    app-dir: com.joram.blinkybadge
+    mpk-path: ${{ steps.build.outputs.mpk-path }}
+    categories: Development
