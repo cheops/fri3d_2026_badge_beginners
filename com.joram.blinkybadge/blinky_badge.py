@@ -226,10 +226,11 @@ class BlinkyBadge(Activity):
             if mode == self._mode:
                 btn.add_style(self._anim_style_selected, 0)
 
-        self.setContentView(screen)
         LightsManager.set_led_num(len(self._badge_leds) + self._sao_count)
         self.recompute_active_leds()
         self.update_leds()
+        
+        self.setContentView(screen)
 
     def select_animation(self, mode, btn):
         self._mode = mode
