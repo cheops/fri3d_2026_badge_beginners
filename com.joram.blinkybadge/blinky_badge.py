@@ -1,8 +1,11 @@
-from mpos import Activity, LightsManager
+from mpos import Activity, LightsManager, SharedPreferences
 import mpos.ui
 import lvgl as lv
 import time
 import math
+
+
+APP_ID = "com.joram.blinkybadge"
 
 class BlinkyBadge(Activity):
     _slider_label = None
@@ -38,7 +41,16 @@ class BlinkyBadge(Activity):
 
     UPDATE_INTERVAL = 0.05  # 20 Hz
 
+
     def onCreate(self):
+        prefs = SharedPreferences(APP_ID)
+        self._badge_show = prefs.get_bool("badge_show", self._badge_show)
+        self._sao_show = prefs.get_bool("sao_show", self._sao_show)
+        self._sao_count = prefs.get_int("sao_count", self._sao_count)
+        self._brightness = prefs.get_int("brightness", self._brightness)
+        self._hue = prefs.get_int("hue", self._hue)
+
+
         screen = lv.obj()
         screen.set_style_pad_all(0, 0)
         screen.set_scrollbar_mode(lv.SCROLLBAR_MODE.OFF)
@@ -51,7 +63,11 @@ class BlinkyBadge(Activity):
         # --- Row 1: Badge leds checkbox / SAO leds checkbox ---
         badge_checkbox = lv.checkbox(screen)
         badge_checkbox.set_text("Badge leds")
-        badge_checkbox.add_state(lv.STATE.CHECKED)
+        if self._badge_show:
+            badge_checkbox.add_state(lv.STATE.CHECKED)
+        else:
+            print(help(badge_checkbox))
+            badge_checkbox.remove_state(lv.STATE.CHECKED)
         badge_checkbox.align(lv.ALIGN.TOP_LEFT, 10, 26)
 
         def badge_checkbox_changed(e):
@@ -62,7 +78,10 @@ class BlinkyBadge(Activity):
 
         sao_checkbox = lv.checkbox(screen)
         sao_checkbox.set_text("SAO leds")
-        sao_checkbox.add_state(lv.STATE.CHECKED)
+        if self._sao_show:
+            sao_checkbox.add_state(lv.STATE.CHECKED)
+        else:
+            sao_checkbox.remove_state(lv.STATE.CHECKED)
         sao_checkbox.align(lv.ALIGN.TOP_LEFT, 170, 26)
 
         def sao_checkbox_changed(e):
@@ -161,7 +180,7 @@ class BlinkyBadge(Activity):
 
         self._hue_slider = lv.slider(screen)
         self._hue_slider.set_range(0, 359)  # degrees, easier to reason about
-        self._hue_slider.set_value(0, False)
+        self._hue_slider.set_value(int(self._hue * 360 / 65536), False)
         self._hue_slider.set_width(hue_w)
         self._hue_slider.set_height(hue_h)
         self._hue_slider.align(lv.ALIGN.TOP_LEFT, 60, 116)
@@ -264,6 +283,15 @@ class BlinkyBadge(Activity):
         self._stop_animation()
         LightsManager.clear()
         LightsManager.write()
+
+        self.prefs = SharedPreferences(APP_ID)
+        editor = self.prefs.edit()
+        editor.put_bool("badge_show", self._badge_show)
+        editor.put_bool("sao_show", self._sao_show)
+        editor.put_int("sao_count", self._sao_count)
+        editor.put_int("brightness", self._brightness)
+        editor.put_int("hue", self._hue)
+        editor.commit()
 
     def _start_animation(self):
         if not self._anim_active:
